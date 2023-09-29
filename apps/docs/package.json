@@ -1,5 +1,5 @@
 {
-  "name": "@acme/docs",
+  "name": "@farge/docs",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,18 +10,18 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "dependencies": {
-    "@acme/core": "workspace:*",
-    "@acme/utils": "workspace:*",
+    "@ctrl/tinycolor": "^4.0.2",
+    "@farge/picker": "workspace:*",
     "next": "^13.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@acme/tsconfig": "workspace:*",
+    "@farge/tsconfig": "workspace:*",
     "@types/node": "^17.0.12",
     "@types/react": "^18.0.22",
     "@types/react-dom": "^18.0.7",
-    "eslint-config-acme": "workspace:*",
+    "eslint-config-farge": "workspace:*",
     "typescript": "^4.5.4"
   }
 }

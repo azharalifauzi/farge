@@ -1,5 +1,5 @@
 {
-  "name": "@acme/utils",
+  "name": "@farge/picker",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -16,14 +16,17 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@acme/tsconfig": "workspace:*",
+    "@farge/tsconfig": "workspace:*",
+    "eslint": "^7.32.0",
+    "eslint-config-farge": "workspace:*",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "eslint": "^7.32.0",
-    "eslint-config-acme": "workspace:*",
-    "react": "^18.2.0",
+    "react": "^17.0.2",
     "tsup": "^5.10.1",
     "typescript": "^4.5.3"
+  },
+  "peerDependencies": {
+    "@ctrl/tinycolor": "^4.0.2"
   },
   "publishConfig": {
     "access": "public"
