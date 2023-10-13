@@ -65,26 +65,26 @@ export const Alpha: React.FC<AlphaProps> = ({
   )
 }
 
-export interface AlphaSelectorProps {
+export interface AlphaPointerProps {
   className?: string
   style?: React.CSSProperties
 }
 
-export const AlphaSelector: React.FC<AlphaSelectorProps> = ({
+export const AlphaPointer: React.FC<AlphaPointerProps> = ({
   style,
   className,
 }) => {
-  const { alphaSelectorX, onChangeColor, alpha, onChangeColorComplete, hsv } =
+  const { alphaPointerX, onChangeColor, alpha, onChangeColorComplete, hsv } =
     useColorPicker()
   const [isMouseDown, setMouseDown] = useState(false)
-  const alphaSelectorRef = useRef<HTMLDivElement>(null)
+  const alphaPointerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const alphaSelectorEl = alphaSelectorRef.current
-    const canvasEl = (alphaSelectorEl?.previousElementSibling ??
-      alphaSelectorEl?.nextElementSibling) as HTMLCanvasElement
+    const alphaPointerEl = alphaPointerRef.current
+    const canvasEl = (alphaPointerEl?.previousElementSibling ??
+      alphaPointerEl?.nextElementSibling) as HTMLCanvasElement
 
-    function updateAlphaSelectorCoord(e: MouseEvent) {
+    function updateAlphaPointerCoord(e: MouseEvent) {
       if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
         return
       }
@@ -99,12 +99,12 @@ export const AlphaSelector: React.FC<AlphaSelectorProps> = ({
 
     function handleMouseDown(e: MouseEvent) {
       setMouseDown(true)
-      updateAlphaSelectorCoord(e)
+      updateAlphaPointerCoord(e)
     }
 
     function handleMouseMove(e: MouseEvent) {
       if (isMouseDown) {
-        updateAlphaSelectorCoord(e)
+        updateAlphaPointerCoord(e)
       }
     }
 
@@ -118,8 +118,8 @@ export const AlphaSelector: React.FC<AlphaSelectorProps> = ({
       }
     }
 
-    if (alphaSelectorEl) {
-      alphaSelectorEl.addEventListener('mousedown', handleMouseDown)
+    if (alphaPointerEl) {
+      alphaPointerEl.addEventListener('mousedown', handleMouseDown)
     }
 
     if (canvasEl) {
@@ -130,8 +130,8 @@ export const AlphaSelector: React.FC<AlphaSelectorProps> = ({
     document.addEventListener('mouseup', handleMouseUp)
 
     return () => {
-      if (alphaSelectorEl) {
-        alphaSelectorEl.removeEventListener('mousedown', handleMouseDown)
+      if (alphaPointerEl) {
+        alphaPointerEl.removeEventListener('mousedown', handleMouseDown)
       }
 
       if (canvasEl) {
@@ -145,13 +145,13 @@ export const AlphaSelector: React.FC<AlphaSelectorProps> = ({
 
   return (
     <div
-      ref={alphaSelectorRef}
+      ref={alphaPointerRef}
       className={className}
       style={{
         position: 'absolute',
         top: '50%',
-        transform: `translate(-${alphaSelectorX}%, -50%)`,
-        left: `${alphaSelectorX}%`,
+        transform: `translate(-${alphaPointerX}%, -50%)`,
+        left: `${alphaPointerX}%`,
         ...style,
       }}
     />

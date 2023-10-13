@@ -4,9 +4,9 @@ import { HSV, HSVA, Numberify, RGB } from '@ctrl/tinycolor'
 type Coordinate = { x: number; y: number }
 
 export interface ColorPickerContextProps {
-  hueSelectorX: number
-  alphaSelectorX: number
-  colorSelector: Coordinate
+  huePointerX: number
+  alphaPointerX: number
+  colorPointer: Coordinate
   hsv: Numberify<HSV>
   rgb: Numberify<RGB>
   alpha: number
@@ -15,9 +15,9 @@ export interface ColorPickerContextProps {
 }
 
 export const ColorPickerContext = createContext<ColorPickerContextProps>({
-  colorSelector: { x: 0, y: 0 },
-  hueSelectorX: 0,
-  alphaSelectorX: 100,
+  colorPointer: { x: 0, y: 0 },
+  huePointerX: 0,
+  alphaPointerX: 100,
   alpha: 1,
   hsv: {
     h: 0,

@@ -63,32 +63,32 @@ export const Canvas: React.FC<CanvasProps> = (props) => {
   return <canvas draggable="false" ref={canvasRef} {...props} />
 }
 
-export interface ColorSelectorProps {
+export interface ColorPointerProps {
   className?: string
   style?: React.CSSProperties
 }
 
-export const ColorSelector: React.FC<ColorSelectorProps> = ({
+export const ColorPointer: React.FC<ColorPointerProps> = ({
   className,
   style,
 }) => {
   const {
-    colorSelector,
+    colorPointer,
     onChangeColor,
     onChangeColorComplete,
     hsv,
     rgb,
     alpha,
   } = useColorPicker()
-  const colorSelectorRef = useRef<HTMLDivElement>(null)
+  const colorPointerRef = useRef<HTMLDivElement>(null)
   const [isMouseDown, setMouseDown] = useState(false)
 
   useEffect(() => {
-    const colorSelectorEl = colorSelectorRef.current
-    const canvasEl = (colorSelectorEl?.nextElementSibling ??
-      colorSelectorEl?.previousElementSibling) as HTMLCanvasElement
+    const colorPointerEl = colorPointerRef.current
+    const canvasEl = (colorPointerEl?.nextElementSibling ??
+      colorPointerEl?.previousElementSibling) as HTMLCanvasElement
 
-    function updateColorSelectorCoord(e: MouseEvent) {
+    function updateColorPointerCoord(e: MouseEvent) {
       if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
         return
       }
@@ -102,12 +102,12 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
 
     function handleMouseDown(e: MouseEvent) {
       setMouseDown(true)
-      updateColorSelectorCoord(e)
+      updateColorPointerCoord(e)
     }
 
     function handleMouseMove(e: MouseEvent) {
       if (isMouseDown) {
-        updateColorSelectorCoord(e)
+        updateColorPointerCoord(e)
       }
     }
 
@@ -121,8 +121,8 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
       }
     }
 
-    if (colorSelectorEl) {
-      colorSelectorEl.addEventListener('mousedown', handleMouseDown)
+    if (colorPointerEl) {
+      colorPointerEl.addEventListener('mousedown', handleMouseDown)
     }
 
     if (canvasEl) {
@@ -133,8 +133,8 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
     document.addEventListener('mouseup', handleMouseUp)
 
     return () => {
-      if (colorSelectorEl) {
-        colorSelectorEl.removeEventListener('mousedown', handleMouseDown)
+      if (colorPointerEl) {
+        colorPointerEl.removeEventListener('mousedown', handleMouseDown)
       }
 
       if (canvasEl) {
@@ -148,11 +148,11 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({
 
   return (
     <div
-      ref={colorSelectorRef}
+      ref={colorPointerRef}
       className={className}
       style={{
-        top: `${colorSelector.y}%`,
-        left: `${colorSelector.x}%`,
+        top: `${colorPointer.y}%`,
+        left: `${colorPointer.x}%`,
         transform: 'translate(-50%, -50%)',
         position: 'absolute',
         background: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,

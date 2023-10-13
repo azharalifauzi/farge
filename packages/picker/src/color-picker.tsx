@@ -26,9 +26,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 }) => {
   const [hsv, setHsv] = useState<Numberify<HSV>>({ h: 0, s: 0, v: 100 })
   const [rgb, setRgb] = useState<Numberify<RGB>>({ r: 255, g: 255, b: 255 })
-  const [hueSelectorX, setHueSelectorX] = useState(0)
-  const [alphaSelectorX, setAlphaSelectorX] = useState(100)
-  const [colorSelector, setColorSelector] = useState({ x: 0, y: 0 })
+  const [huePointerX, setHuePointerX] = useState(0)
+  const [alphaPointerX, setAlphaPointerX] = useState(100)
+  const [colorPointer, setColorPointer] = useState({ x: 0, y: 0 })
   const [alpha, setAlpha] = useState(1)
 
   const firstTime = useRef(true)
@@ -42,12 +42,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         const { r, g, b } = tinyColor.toRgb()
 
         setAlpha(a)
-        setAlphaSelectorX(a * 100)
-        setColorSelector({
+        setAlphaPointerX(a * 100)
+        setColorPointer({
           x: s * 100,
           y: 100 - v * 100,
         })
-        setHueSelectorX((h / 360) * 100)
+        setHuePointerX((h / 360) * 100)
         setHsv({ h, s: s * 100, v: v * 100 })
         setRgb({ r, g, b })
       }
@@ -65,17 +65,17 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     a = minmax(a, 0, 1)
 
     const rgb = hsvToRgb(h, s, v)
-    const hueSelectorX = (h / 360) * 100
+    const huePointerX = (h / 360) * 100
 
     setHsv({ h, s, v })
     setRgb(rgb)
-    setColorSelector({
+    setColorPointer({
       x: s,
       y: 100 - v,
     })
-    setHueSelectorX(hueSelectorX)
+    setHuePointerX(huePointerX)
     setAlpha(a)
-    setAlphaSelectorX(a * 100)
+    setAlphaPointerX(a * 100)
 
     const { r, g, b } = rgb
 
@@ -87,9 +87,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   return (
     <ColorPickerContext.Provider
       value={{
-        colorSelector,
-        hueSelectorX,
-        alphaSelectorX,
+        colorPointer,
+        huePointerX,
+        alphaPointerX,
         hsv,
         rgb,
         alpha,

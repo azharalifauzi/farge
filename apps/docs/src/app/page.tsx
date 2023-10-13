@@ -1,14 +1,14 @@
 import {
   Alpha,
   AlphaContainer,
-  AlphaSelector,
+  AlphaPointer,
   Canvas,
   CanvasContainer,
   ColorPicker,
-  ColorSelector,
+  ColorPointer,
   HueCanvas,
   HueContainer,
-  HueSelector,
+  HuePointer,
 } from '@farge/picker'
 
 export default function Page() {
@@ -18,7 +18,7 @@ export default function Page() {
       <ColorPicker>
         <CanvasContainer style={{ width: 250, height: 250 }}>
           <Canvas style={{ width: '100%', height: '100%' }} />
-          <ColorSelector
+          <ColorPointer
             style={{
               width: 12,
               height: 12,
@@ -47,7 +47,7 @@ export default function Page() {
               left: 0,
             }}
           />
-          <HueSelector
+          <HuePointer
             style={{
               width: 10,
               height: 10,
@@ -69,7 +69,7 @@ export default function Page() {
               borderRadius: 999,
             }}
           />
-          <AlphaSelector
+          <AlphaPointer
             style={{
               width: 10,
               height: 10,

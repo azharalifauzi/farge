@@ -64,27 +64,24 @@ export const HueCanvas: React.FC<HueProps> = ({ className, style }) => {
   )
 }
 
-export interface HueSelectorProps {
+export interface HuePointerProps {
   className?: string
   style?: React.CSSProperties
 }
 
-export const HueSelector: React.FC<HueSelectorProps> = ({
-  className,
-  style,
-}) => {
-  const { hsv, onChangeColor, onChangeColorComplete, hueSelectorX, alpha } =
+export const HuePointer: React.FC<HuePointerProps> = ({ className, style }) => {
+  const { hsv, onChangeColor, onChangeColorComplete, huePointerX, alpha } =
     useColorPicker()
   const [isMouseDown, setMouseDown] = useState(false)
 
-  const hueSelectorRef = useRef<HTMLDivElement>(null)
+  const huePointerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const hueSelectorEl = hueSelectorRef.current
-    const canvasEl = (hueSelectorEl?.nextElementSibling ||
-      hueSelectorEl?.previousElementSibling) as HTMLCanvasElement
+    const huePointerEl = huePointerRef.current
+    const canvasEl = (huePointerEl?.nextElementSibling ||
+      huePointerEl?.previousElementSibling) as HTMLCanvasElement
 
-    function updateHueSelectorCoord(e: MouseEvent) {
+    function updateHuePointerCoord(e: MouseEvent) {
       if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
         return
       }
@@ -98,12 +95,12 @@ export const HueSelector: React.FC<HueSelectorProps> = ({
 
     function handleMouseDown(e: MouseEvent) {
       setMouseDown(true)
-      updateHueSelectorCoord(e)
+      updateHuePointerCoord(e)
     }
 
     function handleMouseMove(e: MouseEvent) {
       if (isMouseDown) {
-        updateHueSelectorCoord(e)
+        updateHuePointerCoord(e)
       }
     }
 
@@ -121,8 +118,8 @@ export const HueSelector: React.FC<HueSelectorProps> = ({
       canvasEl.addEventListener('mousedown', handleMouseDown)
     }
 
-    if (hueSelectorEl) {
-      hueSelectorEl.addEventListener('mousedown', handleMouseDown)
+    if (huePointerEl) {
+      huePointerEl.addEventListener('mousedown', handleMouseDown)
     }
 
     document.addEventListener('mousemove', handleMouseMove)
@@ -133,8 +130,8 @@ export const HueSelector: React.FC<HueSelectorProps> = ({
         canvasEl.removeEventListener('mousedown', handleMouseDown)
       }
 
-      if (hueSelectorEl) {
-        hueSelectorEl.removeEventListener('mousedown', handleMouseDown)
+      if (huePointerEl) {
+        huePointerEl.removeEventListener('mousedown', handleMouseDown)
       }
 
       document.removeEventListener('mousemove', handleMouseMove)
@@ -144,13 +141,13 @@ export const HueSelector: React.FC<HueSelectorProps> = ({
 
   return (
     <div
-      ref={hueSelectorRef}
+      ref={huePointerRef}
       className={className}
       style={{
         position: 'absolute',
-        transform: `translate(-${hueSelectorX}%, -50%)`,
+        transform: `translate(-${huePointerX}%, -50%)`,
         top: '50%',
-        left: `${hueSelectorX}%`,
+        left: `${huePointerX}%`,
         ...style,
       }}
     />

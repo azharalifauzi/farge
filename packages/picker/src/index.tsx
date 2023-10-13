@@ -1,26 +1,26 @@
 export {
   Canvas,
   CanvasContainer,
-  ColorSelector,
+  ColorPointer,
   type CanvasContainerProps,
   type CanvasProps,
-  type ColorSelectorProps,
+  type ColorPointerProps,
 } from './canvas'
 export { ColorPicker, type ColorPickerProps } from './color-picker'
 export { useColorPicker, type ColorPickerContextProps } from './hooks'
 export {
   HueCanvas,
   HueContainer,
-  HueSelector,
+  HuePointer,
   type HueContainerProps,
   type HueProps,
-  type HueSelectorProps,
+  type HuePointerProps,
 } from './hue'
 export {
   Alpha,
   AlphaContainer,
-  AlphaSelector,
+  AlphaPointer,
   type AlphaContainerProps,
   type AlphaProps,
-  type AlphaSelectorProps,
+  type AlphaPointerProps,
 } from './alpha'
