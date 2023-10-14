@@ -10,11 +10,15 @@ import {
   HueContainer,
   HuePointer,
 } from '@farge/picker'
+import Gradient from '@farge/gradient'
 
 export default function Page() {
   return (
-    <>
+    <div style={{ padding: 40 }}>
       <h1>Color Picker Project</h1>
+      <div style={{ width: 250, height: 16, marginBottom: 12 }}>
+        <Gradient />
+      </div>
       <ColorPicker color="hsva(355,100,100,0.75)">
         <CanvasContainer style={{ width: 250, height: 250 }}>
           <Canvas style={{ width: '100%', height: '100%' }} />
@@ -81,6 +85,6 @@ export default function Page() {
           />
         </AlphaContainer>
       </ColorPicker>
-    </>
+    </div>
   )
 }
