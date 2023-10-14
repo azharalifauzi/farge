@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, { RefObject, useEffect, useState } from 'react'
 import { drawHue, minmax } from './utils'
 import { useColorPicker } from './hooks'
 
@@ -23,14 +24,33 @@ export const HueContainer: React.FC<HueContainerProps> = ({
   )
 }
 
-function getHueOnMouseEvent(canvas: HTMLCanvasElement, e: MouseEvent) {
+// @ts-ignore
+HueContainer.id = 'HueContainer'
+HueContainer.displayName = 'HueContainer'
+
+function getHueOnMouseEvent(
+  canvas: HTMLCanvasElement,
+  pointerEl: HTMLElement,
+  e: MouseEvent
+) {
   const canvasBbox = canvas.getBoundingClientRect()
 
-  let localX = e.clientX - canvasBbox.left
-  localX = minmax(localX, 0, canvasBbox.width)
+  let localPointerX = e.clientX - canvasBbox.left - pointerEl.offsetWidth / 2
+  localPointerX = minmax(
+    localPointerX,
+    -pointerEl.offsetWidth / 2,
+    canvasBbox.width - pointerEl.offsetWidth
+  )
 
-  const hue = Math.round((localX / canvasBbox.width) * 360)
-  return hue
+  let localHueX = e.clientX - canvasBbox.left
+  localHueX = minmax(localHueX, 0, canvasBbox.width)
+
+  const hue = Math.round((localHueX / canvasBbox.width) * 360)
+  let pointerX = (localPointerX / canvasBbox.width) * 100
+
+  pointerX = minmax(pointerX, 0, 100)
+
+  return { hue, pointerX }
 }
 
 export interface HueProps {
@@ -39,7 +59,7 @@ export interface HueProps {
 }
 
 export const HueCanvas: React.FC<HueProps> = ({ className, style }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { hueCanvasRef: canvasRef } = useColorPicker()
 
   useEffect(() => {
     const canvasEl = canvasRef.current
@@ -70,26 +90,30 @@ export interface HuePointerProps {
 }
 
 export const HuePointer: React.FC<HuePointerProps> = ({ className, style }) => {
-  const { hsv, onChangeColor, onChangeColorComplete, huePointerX, alpha } =
-    useColorPicker()
+  const {
+    hsv,
+    onChangeColor,
+    onChangeColorComplete,
+    huePointerX,
+    alpha,
+    huePointerRef,
+    hueCanvasRef,
+  } = useColorPicker()
   const [isMouseDown, setMouseDown] = useState(false)
-
-  const huePointerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const huePointerEl = huePointerRef.current
-    const canvasEl = (huePointerEl?.nextElementSibling ||
-      huePointerEl?.previousElementSibling) as HTMLCanvasElement
+    const canvasEl = hueCanvasRef.current
 
     function updateHuePointerCoord(e: MouseEvent) {
-      if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
+      if (!canvasEl || canvasEl.tagName !== 'CANVAS' || !huePointerEl) {
         return
       }
 
-      const hue = getHueOnMouseEvent(canvasEl, e)
+      const { hue, pointerX } = getHueOnMouseEvent(canvasEl, huePointerEl, e)
 
       if (onChangeColor) {
-        onChangeColor({ h: hue, s: hsv.s, v: hsv.v, a: alpha })
+        onChangeColor({ h: hue, s: hsv.s, v: hsv.v, a: alpha }, pointerX)
       }
     }
 
@@ -141,11 +165,11 @@ export const HuePointer: React.FC<HuePointerProps> = ({ className, style }) => {
 
   return (
     <div
-      ref={huePointerRef}
+      ref={huePointerRef as RefObject<HTMLDivElement>}
       className={className}
       style={{
         position: 'absolute',
-        transform: `translate(-${huePointerX}%, -50%)`,
+        transform: `translate(0, -50%)`,
         top: '50%',
         left: `${huePointerX}%`,
         ...style,
@@ -153,3 +177,6 @@ export const HuePointer: React.FC<HuePointerProps> = ({ className, style }) => {
     />
   )
 }
+
+// @ts-ignore
+HuePointer.id = 'HuePointer'

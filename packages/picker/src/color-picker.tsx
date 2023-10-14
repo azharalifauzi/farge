@@ -32,8 +32,19 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const [alpha, setAlpha] = useState(1)
 
   const firstTime = useRef(true)
+  const huePointerRef = useRef<HTMLElement>(null)
+  const hueCanvasRef = useRef<HTMLCanvasElement>(null)
+  const alphaPointerRef = useRef<HTMLElement>(null)
+  const alphaCanvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasPointerRef = useRef<HTMLElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    const huePointerEl = huePointerRef.current
+    const hueCanvasEl = hueCanvasRef.current
+    const alphaPointerEl = alphaPointerRef.current
+    const alphaCanvasEl = alphaCanvasRef.current
+
     if (color && firstTime.current) {
       const tinyColor = new TinyColor(color)
 
@@ -42,12 +53,32 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         const { r, g, b } = tinyColor.toRgb()
 
         setAlpha(a)
-        setAlphaPointerX(a * 100)
+        if (alphaPointerEl && alphaCanvasEl) {
+          const x =
+            a * alphaCanvasEl.offsetWidth - alphaPointerEl.offsetWidth / 2
+          const percentage = (x / alphaCanvasEl.offsetWidth) * 100
+          const max =
+            ((alphaCanvasEl.offsetWidth - alphaPointerEl.offsetWidth) /
+              alphaCanvasEl.offsetWidth) *
+            100
+
+          setAlphaPointerX(minmax(percentage, 0, max))
+        }
         setColorPointer({
           x: s * 100,
           y: 100 - v * 100,
         })
-        setHuePointerX((h / 360) * 100)
+        if (huePointerEl && hueCanvasEl) {
+          const x =
+            (h / 360) * hueCanvasEl.offsetWidth - huePointerEl.offsetWidth / 2
+          const percentage = (x / hueCanvasEl.offsetWidth) * 100
+          const max =
+            ((hueCanvasEl.offsetWidth - huePointerEl.offsetWidth) /
+              hueCanvasEl.offsetWidth) *
+            100
+
+          setHuePointerX(minmax(percentage, 0, max))
+        }
         setHsv({ h, s: s * 100, v: v * 100 })
         setRgb({ r, g, b })
       }
@@ -56,7 +87,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   }, [color])
 
-  const handleChangeColor = (hsva: Numberify<HSVA>) => {
+  const handleChangeColor = (
+    hsva: Numberify<HSVA>,
+    huePointerX?: number,
+    alphaPointerX?: number
+  ) => {
     let { h, s, v, a } = hsva
 
     h = minmax(h, 0, 360)
@@ -65,7 +100,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     a = minmax(a, 0, 1)
 
     const rgb = hsvToRgb(h, s, v)
-    const huePointerX = (h / 360) * 100
 
     setHsv({ h, s, v })
     setRgb(rgb)
@@ -73,9 +107,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       x: s,
       y: 100 - v,
     })
-    setHuePointerX(huePointerX)
+    if (huePointerX !== undefined) {
+      setHuePointerX(huePointerX)
+    }
     setAlpha(a)
-    setAlphaPointerX(a * 100)
+    if (alphaPointerX) {
+      setAlphaPointerX(alphaPointerX)
+    }
 
     const { r, g, b } = rgb
 
@@ -93,6 +131,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         hsv,
         rgb,
         alpha,
+        hueCanvasRef,
+        huePointerRef,
+        alphaCanvasRef,
+        alphaPointerRef,
+        canvasRef,
+        canvasPointerRef,
         onChangeColor: handleChangeColor,
         onChangeColorComplete: (hsva) => {
           const { h, s, v, a } = hsva

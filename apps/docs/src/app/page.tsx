@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <>
       <h1>Color Picker Project</h1>
-      <ColorPicker>
+      <ColorPicker color="hsva(355,100,100,0.75)">
         <CanvasContainer style={{ width: 250, height: 250 }}>
           <Canvas style={{ width: '100%', height: '100%' }} />
           <ColorPointer

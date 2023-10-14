@@ -1,7 +1,14 @@
-import { createContext, useContext } from 'react'
+import { createContext, createRef, useContext } from 'react'
 import { HSV, HSVA, Numberify, RGB } from '@ctrl/tinycolor'
 
 type Coordinate = { x: number; y: number }
+
+const huePointerRef = createRef<HTMLElement>()
+const hueCanvasRef = createRef<HTMLCanvasElement>()
+const alphaPointerRef = createRef<HTMLElement>()
+const alphaCanvasRef = createRef<HTMLCanvasElement>()
+const canvasRef = createRef<HTMLCanvasElement>()
+const canvasPointerRef = createRef<HTMLElement>()
 
 export interface ColorPickerContextProps {
   huePointerX: number
@@ -10,11 +17,27 @@ export interface ColorPickerContextProps {
   hsv: Numberify<HSV>
   rgb: Numberify<RGB>
   alpha: number
-  onChangeColor?: (hsva: Numberify<HSVA>) => void
+  huePointerRef: typeof huePointerRef
+  hueCanvasRef: typeof hueCanvasRef
+  alphaPointerRef: typeof alphaPointerRef
+  alphaCanvasRef: typeof alphaCanvasRef
+  canvasRef: typeof canvasRef
+  canvasPointerRef: typeof canvasPointerRef
+  onChangeColor?: (
+    hsva: Numberify<HSVA>,
+    huePointerX?: number,
+    alphaPointerX?: number
+  ) => void
   onChangeColorComplete?: (hsva: Numberify<HSVA>) => void
 }
 
 export const ColorPickerContext = createContext<ColorPickerContextProps>({
+  huePointerRef,
+  hueCanvasRef,
+  alphaCanvasRef,
+  alphaPointerRef,
+  canvasRef,
+  canvasPointerRef,
   colorPointer: { x: 0, y: 0 },
   huePointerX: 0,
   alphaPointerX: 100,

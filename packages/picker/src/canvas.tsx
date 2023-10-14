@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, RefObject, useEffect, useState } from 'react'
 import { useColorPicker } from './hooks'
 import { drawCanvas, minmax } from './utils'
 import { hsvToRgb } from '@ctrl/tinycolor'
@@ -48,8 +48,7 @@ export interface CanvasProps
   > {}
 
 export const Canvas: React.FC<CanvasProps> = (props) => {
-  const { hsv } = useColorPicker()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { hsv, canvasRef } = useColorPicker()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -79,14 +78,14 @@ export const ColorPointer: React.FC<ColorPointerProps> = ({
     hsv,
     rgb,
     alpha,
+    canvasRef,
+    canvasPointerRef: colorPointerRef,
   } = useColorPicker()
-  const colorPointerRef = useRef<HTMLDivElement>(null)
   const [isMouseDown, setMouseDown] = useState(false)
 
   useEffect(() => {
     const colorPointerEl = colorPointerRef.current
-    const canvasEl = (colorPointerEl?.nextElementSibling ??
-      colorPointerEl?.previousElementSibling) as HTMLCanvasElement
+    const canvasEl = canvasRef.current
 
     function updateColorPointerCoord(e: MouseEvent) {
       if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
@@ -148,7 +147,7 @@ export const ColorPointer: React.FC<ColorPointerProps> = ({
 
   return (
     <div
-      ref={colorPointerRef}
+      ref={colorPointerRef as RefObject<HTMLDivElement>}
       className={className}
       style={{
         top: `${colorPointer.y}%`,
