@@ -28,29 +28,14 @@ export const HueContainer: React.FC<HueContainerProps> = ({
 HueContainer.id = 'HueContainer'
 HueContainer.displayName = 'HueContainer'
 
-function getHueOnMouseEvent(
-  canvas: HTMLCanvasElement,
-  pointerEl: HTMLElement,
-  e: MouseEvent
-) {
+function getHueOnMouseEvent(canvas: HTMLCanvasElement, e: MouseEvent) {
   const canvasBbox = canvas.getBoundingClientRect()
-
-  let localPointerX = e.clientX - canvasBbox.left - pointerEl.offsetWidth / 2
-  localPointerX = minmax(
-    localPointerX,
-    -pointerEl.offsetWidth / 2,
-    canvasBbox.width - pointerEl.offsetWidth
-  )
 
   let localHueX = e.clientX - canvasBbox.left
   localHueX = minmax(localHueX, 0, canvasBbox.width)
-
   const hue = Math.round((localHueX / canvasBbox.width) * 360)
-  let pointerX = (localPointerX / canvasBbox.width) * 100
 
-  pointerX = minmax(pointerX, 0, 100)
-
-  return { hue, pointerX }
+  return { hue }
 }
 
 export interface HueProps {
@@ -106,14 +91,14 @@ export const HuePointer: React.FC<HuePointerProps> = ({ className, style }) => {
     const canvasEl = hueCanvasRef.current
 
     function updateHuePointerCoord(e: MouseEvent) {
-      if (!canvasEl || canvasEl.tagName !== 'CANVAS' || !huePointerEl) {
+      if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
         return
       }
 
-      const { hue, pointerX } = getHueOnMouseEvent(canvasEl, huePointerEl, e)
+      const { hue } = getHueOnMouseEvent(canvasEl, e)
 
       if (onChangeColor) {
-        onChangeColor({ h: hue, s: hsv.s, v: hsv.v, a: alpha }, pointerX)
+        onChangeColor({ h: hue, s: hsv.s, v: hsv.v, a: alpha })
       }
     }
 

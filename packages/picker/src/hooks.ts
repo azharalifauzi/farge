@@ -23,11 +23,7 @@ export interface ColorPickerContextProps {
   alphaCanvasRef: typeof alphaCanvasRef
   canvasRef: typeof canvasRef
   canvasPointerRef: typeof canvasPointerRef
-  onChangeColor?: (
-    hsva: Numberify<HSVA>,
-    huePointerX?: number,
-    alphaPointerX?: number
-  ) => void
+  onChangeColor?: (hsva: Numberify<HSVA>) => void
   onChangeColorComplete?: (hsva: Numberify<HSVA>) => void
 }
 

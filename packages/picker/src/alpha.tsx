@@ -2,29 +2,14 @@ import React, { RefObject, useEffect, useState } from 'react'
 import { drawAlpha, minmax } from './utils'
 import { useColorPicker } from './hooks'
 
-function getAlphaCoordOnMouseEvent(
-  canvas: HTMLCanvasElement,
-  pointerEl: HTMLElement,
-  e: MouseEvent
-) {
+function getAlphaCoordOnMouseEvent(canvas: HTMLCanvasElement, e: MouseEvent) {
   const canvasBbox = canvas.getBoundingClientRect()
 
   let localAlphaX = e.clientX - canvasBbox.left
   localAlphaX = minmax(localAlphaX, 0, canvasBbox.width)
-
-  let localPointerX = e.clientX - canvasBbox.left - pointerEl.offsetWidth / 2
-  localPointerX = minmax(
-    localPointerX,
-    -pointerEl.offsetWidth / 2,
-    canvasBbox.width - pointerEl.offsetWidth
-  )
-
-  let pointerX = (localPointerX / canvasBbox.width) * 100
-  pointerX = minmax(pointerX, 0, 100)
-
   const alpha = parseFloat((localAlphaX / canvasBbox.width).toFixed(2))
 
-  return { alpha, pointerX }
+  return { alpha }
 }
 
 export interface AlphaContainerProps {
@@ -106,19 +91,15 @@ export const AlphaPointer: React.FC<AlphaPointerProps> = ({
     const canvasEl = alphaCanvasRef.current
 
     function updateAlphaPointerCoord(e: MouseEvent) {
-      if (!canvasEl || canvasEl.tagName !== 'CANVAS' || !alphaPointerEl) {
+      if (!canvasEl || canvasEl.tagName !== 'CANVAS') {
         return
       }
 
-      const { alpha, pointerX } = getAlphaCoordOnMouseEvent(
-        canvasEl,
-        alphaPointerEl,
-        e
-      )
+      const { alpha } = getAlphaCoordOnMouseEvent(canvasEl, e)
       const { h, s, v } = hsv
 
       if (onChangeColor) {
-        onChangeColor({ h, s, v, a: alpha }, undefined, pointerX)
+        onChangeColor({ h, s, v, a: alpha })
       }
     }
 

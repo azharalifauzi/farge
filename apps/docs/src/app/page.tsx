@@ -19,7 +19,7 @@ export default function Page() {
       <div style={{ width: 250, height: 16, marginBottom: 12 }}>
         <Gradient />
       </div>
-      <ColorPicker color="hsva(355,100,100,0.75)">
+      <ColorPicker color="hsva(225,100,100,0.75)">
         <CanvasContainer style={{ width: 250, height: 250 }}>
           <Canvas style={{ width: '100%', height: '100%' }} />
           <ColorPointer
