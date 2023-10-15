@@ -1,5 +1,5 @@
 import { createContext, createRef, useContext } from 'react'
-import { HSV, HSVA, Numberify, RGB } from '@ctrl/tinycolor'
+import { HSV, HSVA, Numberify, RGB, RGBA } from '@ctrl/tinycolor'
 
 type Coordinate = { x: number; y: number }
 
@@ -16,6 +16,9 @@ export interface ColorPickerContextProps {
   colorPointer: Coordinate
   hsv: Numberify<HSV>
   rgb: Numberify<RGB>
+  /**
+   * Value between 0 to 1
+   */
   alpha: number
   huePointerRef: typeof huePointerRef
   hueCanvasRef: typeof hueCanvasRef
@@ -23,7 +26,7 @@ export interface ColorPickerContextProps {
   alphaCanvasRef: typeof alphaCanvasRef
   canvasRef: typeof canvasRef
   canvasPointerRef: typeof canvasPointerRef
-  onChangeColor?: (hsva: Numberify<HSVA>) => void
+  onChangeColor?: (hsva: Numberify<HSVA> | Numberify<RGBA>) => void
   onChangeColorComplete?: (hsva: Numberify<HSVA>) => void
 }
 

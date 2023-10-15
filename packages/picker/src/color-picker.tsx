@@ -8,6 +8,8 @@ import {
   TinyColor,
   hsvToRgb,
   rgbToHex,
+  RGBA,
+  rgbToHsv,
 } from '@ctrl/tinycolor'
 import { minmax } from './utils'
 
@@ -89,27 +91,63 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   }, [color])
 
-  const handleChangeColor = (hsva: Numberify<HSVA>) => {
+  const handleChangeColor = (color: Numberify<HSVA> | Numberify<RGBA>) => {
     const huePointerEl = huePointerRef.current
     const hueCanvasEl = hueCanvasRef.current
     const alphaPointerEl = alphaPointerRef.current
     const alphaCanvasEl = alphaCanvasRef.current
 
-    let { h, s, v, a } = hsva
+    let hsva: Numberify<HSVA> | undefined = undefined
+    let rgba: Numberify<RGBA> | undefined = undefined
+
+    // eslint-disable-next-line no-prototype-builtins
+    if (color.hasOwnProperty('h')) {
+      hsva = color as Numberify<HSVA>
+    } else {
+      rgba = color as Numberify<RGBA>
+    }
+
+    let h = 360
+    let s = 100
+    let v = 100
+    let a = 1
+
+    if (hsva) {
+      h = hsva.h
+      s = hsva.s
+      v = hsva.v
+      a = hsva.a
+    } else if (rgba) {
+      const { r, g, b } = rgba
+      const hsv = rgbToHsv(r, g, b)
+
+      h = hsv.h * 360
+      s = hsv.s * 100
+      v = hsv.v * 100
+      a = rgba.a
+    }
 
     h = minmax(h, 0, 360)
     s = minmax(s, 0, 100)
     v = minmax(v, 0, 100)
     a = minmax(a, 0, 1)
 
-    const rgb = hsvToRgb(h, s, v)
+    let rgb = hsva ? hsvToRgb(h, s, v) : undefined
+
+    if (rgba) {
+      const { a: __a__, ...__rgb__ } = rgba
+      rgb = __rgb__
+      a = minmax(__a__, 0, 1)
+    }
 
     setHsv({ h, s, v })
-    setRgb(rgb)
     setColorPointer({
       x: s,
       y: 100 - v,
     })
+    if (rgb) {
+      setRgb(rgb)
+    }
     if (hueCanvasEl && huePointerEl) {
       setHuePointerX(getPointerX(h / 360, hueCanvasEl, huePointerEl))
     }
@@ -118,9 +156,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       setAlphaPointerX(getPointerX(a, alphaCanvasEl, alphaPointerEl))
     }
 
-    const { r, g, b } = rgb
-
-    if (onChange) {
+    if (onChange && rgb) {
+      const { r, g, b } = rgb
       onChange(rgbToHex(r, g, b, false), a)
     }
   }
