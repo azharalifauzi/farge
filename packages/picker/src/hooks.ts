@@ -10,6 +10,10 @@ const alphaCanvasRef = createRef<HTMLCanvasElement>()
 const canvasRef = createRef<HTMLCanvasElement>()
 const canvasPointerRef = createRef<HTMLElement>()
 
+export interface onChangeColorOptions {
+  ignoreCallback?: boolean
+}
+
 export interface ColorPickerContextProps {
   huePointerX: number
   alphaPointerX: number
@@ -26,7 +30,10 @@ export interface ColorPickerContextProps {
   alphaCanvasRef: typeof alphaCanvasRef
   canvasRef: typeof canvasRef
   canvasPointerRef: typeof canvasPointerRef
-  onChangeColor?: (hsva: Numberify<HSVA> | Numberify<RGBA>) => void
+  onChangeColor?: (
+    hsva: Numberify<HSVA> | Numberify<RGBA>,
+    opts?: onChangeColorOptions
+  ) => void
   onChangeColorComplete?: (hsva: Numberify<HSVA>) => void
 }
 

@@ -35,8 +35,8 @@ function getSaturationAndValueOnMouseEvent(
   localX = minmax(localX, 0, canvasBbox.width)
   localY = minmax(localY, 0, canvasBbox.height)
 
-  const s = Math.round((localX / canvasBbox.width) * 100)
-  const v = Math.round(100 - (localY / canvasBbox.height) * 100)
+  const s = (localX / canvasBbox.width) * 100
+  const v = 100 - (localY / canvasBbox.height) * 100
 
   return { s, v }
 }

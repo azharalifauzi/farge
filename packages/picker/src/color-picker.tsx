@@ -1,5 +1,5 @@
 import React, { CSSProperties, useEffect, useRef, useState } from 'react'
-import { ColorPickerContext } from './hooks'
+import { ColorPickerContext, onChangeColorOptions } from './hooks'
 import {
   HSV,
   HSVA,
@@ -15,6 +15,11 @@ import { minmax } from './utils'
 
 export interface ColorPickerProps {
   color?: string
+  /**
+   * color: hex string
+   *
+   * alpha: 0 to 1
+   */
   onChange?: (color: string, alpha: number) => void
   onChangeComplete?: (color: string, alpha: number) => void
   children?: React.ReactNode
@@ -91,7 +96,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     }
   }, [color])
 
-  const handleChangeColor = (color: Numberify<HSVA> | Numberify<RGBA>) => {
+  const handleChangeColor = (
+    color: Numberify<HSVA> | Numberify<RGBA>,
+    opts?: onChangeColorOptions
+  ) => {
     const huePointerEl = huePointerRef.current
     const hueCanvasEl = hueCanvasRef.current
     const alphaPointerEl = alphaPointerRef.current
@@ -156,7 +164,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       setAlphaPointerX(getPointerX(a, alphaCanvasEl, alphaPointerEl))
     }
 
-    if (onChange && rgb) {
+    if (onChange && rgb && !opts?.ignoreCallback) {
       const { r, g, b } = rgb
       onChange(rgbToHex(r, g, b, false), a)
     }

@@ -15,6 +15,7 @@ import {
   HuePointer,
   useColorPicker,
 } from '@farge/picker'
+import Gradient, { ColorStop, GradientProps } from '@farge/gradient'
 import React, { useMemo, useState } from 'react'
 import {
   Select,
@@ -24,14 +25,150 @@ import {
   SelectValue,
 } from '../ui/select'
 
-const FigmaColorPicker = () => {
+export type GradientType = 'linear' | 'radial' | 'angular'
+export type ColorPickerMode = 'solid' | 'gradient'
+
+interface FigmaColorPickerProps {
+  color?: string
+  onChange?: (color: string) => void
+  onChangeColorStop?: (colorStops: ColorStop[]) => void
+  colorStops?: ColorStop[]
+  onChangeMode?: (mode: ColorPickerMode) => void
+  mode?: ColorPickerMode
+  gradientType?: GradientType
+  onChangeGradientType?: (gradientType: GradientType) => void
+}
+
+const FigmaColorPicker: React.FC<FigmaColorPickerProps> = ({
+  color = 'rgba(255, 0, 0, 1)',
+  onChange,
+  colorStops,
+  onChangeColorStop,
+  mode,
+  onChangeMode,
+  gradientType,
+  onChangeGradientType,
+}) => {
+  const [localMode, setMode] = useState<ColorPickerMode>('solid')
+  const [localColor, setLocalColor] = useState(color)
+  const [localColorStops, setColorStops] = useState<ColorStop[]>([
+    {
+      position: 0,
+      value: 'rgba(255, 0, 0, 1)',
+    },
+    {
+      position: 1,
+      value: 'rgba(255, 0, 0, 0)',
+    },
+  ])
+  const [activeIdxColorStops, setActiveIdxColorStops] = useState(0)
+  const [localGradientType, setGradientType] = useState<GradientType>('linear')
+
   return (
-    <ColorPicker className="w-[275px] select-none" color="hsva(225,100,100,1)">
+    <ColorPicker
+      className="w-[275px] select-none shadow-lg"
+      color={localColor}
+      onChange={(color, alpha) => {
+        const c = new TinyColor(color)
+        c.setAlpha(alpha)
+        setLocalColor(c.toHex8String())
+        if (onChange) {
+          onChange(c.toRgbString())
+        }
+
+        if ((mode || localMode) === 'gradient') {
+          const cs = [...(colorStops || localColorStops)]
+          cs[activeIdxColorStops].value = c.toRgbString()
+          setColorStops(cs)
+
+          if (onChangeColorStop) {
+            onChangeColorStop(cs)
+          }
+        }
+      }}
+    >
+      <div className="flex items-center gap-0.5 py-1 border-b px-4 border-gray-100">
+        <button
+          onClick={() => {
+            setMode('solid')
+            if (onChangeMode) {
+              onChangeMode('solid')
+            }
+          }}
+          className={cn(
+            'flex items-center justify-center w-6 h-6 cursor-pointer hover:border rounded-sm',
+            {
+              'bg-gray-200': (mode || localMode) === 'solid',
+            }
+          )}
+        >
+          <div className="w-3 h-3 bg-black"></div>
+        </button>
+        <button
+          onClick={() => {
+            setMode('gradient')
+            setActiveIdxColorStops(0)
+
+            if (onChangeMode) {
+              onChangeMode('gradient')
+            }
+          }}
+          className={cn(
+            'flex items-center justify-center w-6 h-6 cursor-pointer hover:border rounded-sm',
+            {
+              'bg-gray-200': (mode || localMode) === 'gradient',
+            }
+          )}
+        >
+          <div className="w-3 h-3 bg-gradient-to-b from-gray-800 to-gray-300"></div>
+        </button>
+      </div>
+      {(mode || localMode) === 'gradient' && (
+        <>
+          <div className="px-4 pb-2 pt-4">
+            <Select
+              value={gradientType || localGradientType}
+              onValueChange={(gt) => {
+                setGradientType(gt as GradientType)
+                if (onChangeGradientType) {
+                  onChangeGradientType(gt as GradientType)
+                }
+              }}
+            >
+              <SelectTrigger className="text-xs h-7 px-2 rounded-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="z-[99999]">
+                <SelectItem className="text-xs" value="linear">
+                  Linear
+                </SelectItem>
+                <SelectItem className="text-xs" value="radial">
+                  Radial
+                </SelectItem>
+                <SelectItem className="text-xs" value="angular">
+                  Angular
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <GradientPicker
+            activeIdx={activeIdxColorStops}
+            colorStops={colorStops || localColorStops}
+            onChange={(cs) => {
+              setColorStops(cs)
+              if (onChangeColorStop) {
+                onChangeColorStop(cs)
+              }
+            }}
+            onChangeSelection={(_, idx) => setActiveIdxColorStops(idx)}
+          />
+        </>
+      )}
       <CanvasContainer className="w-full h-[275px]">
         <Canvas className="w-full h-full" />
         <ColorPointer className="w-3 h-3 border-2 border-white rounded-full cursor-pointer" />
       </CanvasContainer>
-      <div className="px-3">
+      <div className="px-3 pb-5">
         <HueContainer className="w-[200px] h-3 mt-2 ml-auto mb-2">
           <HueCanvas className="w-full h-full rounded-full absolute top-0 left-0" />
           <HuePointer className="w-3 h-3 shadow-[0_4px_20px_rgba(0,0,0,0.1)] rounded-full cursor-pointer border-2 border-white" />
@@ -43,6 +180,35 @@ const FigmaColorPicker = () => {
         <InputColor />
       </div>
     </ColorPicker>
+  )
+}
+
+const GradientPicker: React.FC<GradientProps> = ({
+  colorStops,
+  onChange,
+  onChangeSelection,
+  activeIdx,
+}) => {
+  const { onChangeColor } = useColorPicker()
+
+  return (
+    <div className="w-full px-5 h-4 mb-4 mt-10">
+      <Gradient
+        activeIdx={activeIdx}
+        colorStops={colorStops}
+        onChange={onChange}
+        onChangeSelection={(cs, idx) => {
+          const color = new TinyColor(cs.value)
+          if (onChangeColor) {
+            onChangeColor(color.toRgb(), { ignoreCallback: true })
+          }
+
+          if (onChangeSelection) {
+            onChangeSelection(cs, idx)
+          }
+        }}
+      />
+    </div>
   )
 }
 
@@ -163,7 +329,7 @@ const InputColor = () => {
 
     if (colorFormat === 'hex') {
       color = new TinyColor(localHex.hex)
-      color.a = parseFloat((localHex.a / 100).toFixed(2))
+      color.setAlpha(parseFloat((localHex.a / 100).toFixed(2)))
     } else if (colorFormat === 'rgb') {
       localRgb.a = parseFloat((localRgb.a / 100).toFixed(2))
       color = new TinyColor(localRgb)
@@ -234,7 +400,7 @@ const InputColor = () => {
         {colorFormat !== 'hex' && (
           <>
             <input
-              value={getColor(1)}
+              value={Math.round(Number(getColor(1)))}
               name={inputNameMap[1][colorFormat]}
               className="px-1 text-xs focus:outline-none group-hover:border-r border-gray-200 group-focus-within:border-r"
               autoComplete="off"
@@ -243,7 +409,7 @@ const InputColor = () => {
               onBlur={handleBlur}
             />
             <input
-              value={getColor(2)}
+              value={Math.round(Number(getColor(2)))}
               name={inputNameMap[2][colorFormat]}
               className="px-1 text-xs focus:outline-none group-hover:border-r border-gray-200 group-focus-within:border-r"
               autoComplete="off"

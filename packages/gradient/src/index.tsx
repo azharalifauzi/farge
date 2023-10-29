@@ -18,12 +18,14 @@ export interface GradientProps {
   colorStops?: ColorStop[]
   onChange?: (colorStops: ColorStop[]) => void
   onChangeSelection?: (colorStop: ColorStop, idx: number) => void
+  activeIdx?: number
 }
 
 const Gradient: React.FC<GradientProps> = ({
   colorStops,
   onChange,
   onChangeSelection,
+  activeIdx,
 }) => {
   const [localColorStops, setLocalColorStops] = useState<ColorStop[]>([
     {
@@ -35,7 +37,7 @@ const Gradient: React.FC<GradientProps> = ({
       value: 'rgba(255, 0, 0, 0)',
     },
   ])
-  const [activeIdx, setActiveIdx] = useState(0)
+  const [localActiveIdx, setActiveIdx] = useState(0)
   const [isMouseDown, setMouseDown] = useState(false)
 
   const gradientRef = useRef<HTMLDivElement>(null)
@@ -60,7 +62,7 @@ const Gradient: React.FC<GradientProps> = ({
       const gradientEl = gradientRef.current
       if (isMouseDown && gradientEl) {
         const colorStops = [...localColorStops]
-        const currentColorStop = colorStops[activeIdx]
+        const currentColorStop = colorStops[activeIdx || localActiveIdx]
 
         const newPosition =
           (currentColorStop.position * gradientEl.offsetWidth + e.movementX) /
@@ -82,7 +84,7 @@ const Gradient: React.FC<GradientProps> = ({
       if (e.key === 'Backspace' || e.key === 'Delete') {
         const colorStops = [...localColorStops]
         if (colorStops.length > 1) {
-          colorStops.splice(activeIdx, 1)
+          colorStops.splice(activeIdx || localActiveIdx, 1)
           setLocalColorStops(colorStops)
           setActiveIdx(0)
 
@@ -106,7 +108,7 @@ const Gradient: React.FC<GradientProps> = ({
       document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isMouseDown, activeIdx, localColorStops])
+  }, [isMouseDown, activeIdx, localColorStops, localActiveIdx])
 
   return (
     <div
