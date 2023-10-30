@@ -147,7 +147,7 @@ export const AlphaPointer: React.FC<AlphaPointerProps> = ({
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [hsv, isMouseDown, alpha])
+  }, [hsv, isMouseDown, alpha, onChangeColor, onChangeColorComplete])
 
   return (
     <div

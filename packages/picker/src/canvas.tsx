@@ -143,7 +143,7 @@ export const ColorPointer: React.FC<ColorPointerProps> = ({
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [hsv, isMouseDown, alpha])
+  }, [hsv, isMouseDown, alpha, onChangeColor, onChangeColorComplete])
 
   return (
     <div

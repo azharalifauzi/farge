@@ -67,7 +67,7 @@ const FigmaColorPicker: React.FC<FigmaColorPickerProps> = ({
   return (
     <ColorPicker
       className="w-[275px] select-none shadow-lg"
-      color={localColor}
+      color={color || localColor}
       onChange={(color, alpha) => {
         const c = new TinyColor(color)
         c.setAlpha(alpha)
@@ -91,6 +91,15 @@ const FigmaColorPicker: React.FC<FigmaColorPickerProps> = ({
         <button
           onClick={() => {
             setMode('solid')
+            const color = [...(colorStops || localColorStops)].sort(
+              (a, b) => a.position - b.position
+            )[0].value
+            setLocalColor(color)
+
+            if (onChange) {
+              onChange(color)
+            }
+
             if (onChangeMode) {
               onChangeMode('solid')
             }
@@ -108,6 +117,15 @@ const FigmaColorPicker: React.FC<FigmaColorPickerProps> = ({
           onClick={() => {
             setMode('gradient')
             setActiveIdxColorStops(0)
+
+            const color = [...(colorStops || localColorStops)].sort(
+              (a, b) => a.position - b.position
+            )[0].value
+            setLocalColor(color)
+
+            if (onChange) {
+              onChange(color)
+            }
 
             if (onChangeMode) {
               onChangeMode('gradient')
@@ -160,7 +178,14 @@ const FigmaColorPicker: React.FC<FigmaColorPickerProps> = ({
                 onChangeColorStop(cs)
               }
             }}
-            onChangeSelection={(_, idx) => setActiveIdxColorStops(idx)}
+            onChangeSelection={(cs, idx) => {
+              setLocalColor(cs.value)
+              setActiveIdxColorStops(idx)
+
+              if (onChange) {
+                onChange(cs.value)
+              }
+            }}
           />
         </>
       )}
@@ -189,24 +214,13 @@ const GradientPicker: React.FC<GradientProps> = ({
   onChangeSelection,
   activeIdx,
 }) => {
-  const { onChangeColor } = useColorPicker()
-
   return (
     <div className="w-full px-5 h-4 mb-4 mt-10">
       <Gradient
         activeIdx={activeIdx}
         colorStops={colorStops}
         onChange={onChange}
-        onChangeSelection={(cs, idx) => {
-          const color = new TinyColor(cs.value)
-          if (onChangeColor) {
-            onChangeColor(color.toRgb(), { ignoreCallback: true })
-          }
-
-          if (onChangeSelection) {
-            onChangeSelection(cs, idx)
-          }
-        }}
+        onChangeSelection={onChangeSelection}
       />
     </div>
   )
@@ -268,7 +282,11 @@ const InputColor = () => {
 
     if (colorFormat === 'hsv') {
       const key = inputNameMap[index].hsv
-      return isEdit ? localHsb[key] : key === 'a' ? alpha * 100 : hsv[key]
+      return isEdit
+        ? localHsb[key]
+        : key === 'a'
+        ? alpha * 100
+        : Math.round(hsv[key])
     }
 
     const key = inputNameMap[index].rgb
@@ -307,6 +325,7 @@ const InputColor = () => {
   const handleFocus = () => {
     setEdit(true)
     const { r, g, b } = rgb
+    const { h, s, v } = hsv
 
     setLocalRgb({
       r: Math.round(r),
@@ -314,7 +333,12 @@ const InputColor = () => {
       b: Math.round(b),
       a: alpha * 100,
     })
-    setLocalHsb({ ...hsv, a: alpha * 100 })
+    setLocalHsb({
+      h: Math.round(h),
+      s: Math.round(s),
+      v: Math.round(v),
+      a: alpha * 100,
+    })
 
     const hex = rgbToHex(r, g, b, false).toUpperCase()
     setLocalHex({
@@ -339,12 +363,16 @@ const InputColor = () => {
     }
 
     if (color.isValid && onChangeColor) {
-      if (colorFormat === 'hsv') {
-        const hsv = color.toHsv()
-        hsv.s = Math.round(hsv.s * 100)
-        hsv.v = Math.round(hsv.v * 100)
-        hsv.h = Math.round(hsv.h)
-        onChangeColor(hsv)
+      if (
+        colorFormat === 'hsv' &&
+        Object.values(localHsb).every((v) => !isNaN(Number(v)))
+      ) {
+        onChangeColor({
+          h: Number(localHsb.h),
+          s: Number(localHsb.s),
+          v: Number(localHsb.v),
+          a: localHsb.a,
+        })
       } else {
         const rgb = color.toRgb()
         onChangeColor(rgb)
@@ -400,7 +428,7 @@ const InputColor = () => {
         {colorFormat !== 'hex' && (
           <>
             <input
-              value={Math.round(Number(getColor(1)))}
+              value={getColor(1)}
               name={inputNameMap[1][colorFormat]}
               className="px-1 text-xs focus:outline-none group-hover:border-r border-gray-200 group-focus-within:border-r"
               autoComplete="off"
@@ -409,7 +437,7 @@ const InputColor = () => {
               onBlur={handleBlur}
             />
             <input
-              value={Math.round(Number(getColor(2)))}
+              value={getColor(2)}
               name={inputNameMap[2][colorFormat]}
               className="px-1 text-xs focus:outline-none group-hover:border-r border-gray-200 group-focus-within:border-r"
               autoComplete="off"

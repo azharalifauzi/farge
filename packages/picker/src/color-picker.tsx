@@ -56,7 +56,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const [colorPointer, setColorPointer] = useState({ x: 0, y: 0 })
   const [alpha, setAlpha] = useState(1)
 
-  const firstTime = useRef(true)
+  // NOTE: using range 0 to 1 for saturation and brightness to not confuse tiny color
+  const cacheHsv = useRef({ h: 0, s: 0, v: 1, a: 1 })
   const huePointerRef = useRef<HTMLElement>(null)
   const hueCanvasRef = useRef<HTMLCanvasElement>(null)
   const alphaPointerRef = useRef<HTMLElement>(null)
@@ -70,12 +71,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     const alphaPointerEl = alphaPointerRef.current
     const alphaCanvasEl = alphaCanvasRef.current
 
-    if (color && firstTime.current) {
-      const tinyColor = new TinyColor(color)
+    if (color) {
+      const newColor = new TinyColor(color)
+      const currentColor = new TinyColor(cacheHsv.current)
 
-      if (tinyColor.isValid) {
-        const { h, s, v, a } = tinyColor.toHsv()
-        const { r, g, b } = tinyColor.toRgb()
+      if (newColor.isValid && !newColor.equals(currentColor)) {
+        // eslint-disable-next-line prefer-const
+        let { h, s, v, a } = newColor.toHsv()
+        const { r, g, b } = newColor.toRgb()
 
         setAlpha(a)
         if (alphaPointerEl && alphaCanvasEl) {
@@ -88,11 +91,21 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         if (huePointerEl && hueCanvasEl) {
           setHuePointerX(getPointerX(h / 360, hueCanvasEl, huePointerEl))
         }
-        setHsv({ h, s: s * 100, v: v * 100 })
+        setHsv({
+          h,
+          s: s * 100,
+          v: v * 100,
+        })
         setRgb({ r, g, b })
-      }
 
-      firstTime.current = false
+        // NOTE: using range 0 to 1 for saturation and brightness to not confuse tiny color
+        cacheHsv.current = {
+          h,
+          s,
+          v,
+          a,
+        }
+      }
     }
   }, [color])
 
@@ -162,6 +175,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
     setAlpha(a)
     if (alphaCanvasEl && alphaPointerEl) {
       setAlphaPointerX(getPointerX(a, alphaCanvasEl, alphaPointerEl))
+    }
+
+    // NOTE: using range 0 to 1 for saturation and brightness to not confuse tiny color
+    cacheHsv.current = {
+      h,
+      s: s / 100,
+      v: v / 100,
+      a,
     }
 
     if (onChange && rgb && !opts?.ignoreCallback) {

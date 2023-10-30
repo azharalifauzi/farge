@@ -51,15 +51,7 @@ const Demo = () => {
         gradientType={gradientType}
         mode={mode}
         onChange={(color) => setColor(color)}
-        onChangeMode={(mode) => {
-          setMode(mode)
-
-          if (mode === 'solid') {
-            setColor(
-              colorStops.sort((a, b) => a.position - b.position)[0].value
-            )
-          }
-        }}
+        onChangeMode={(mode) => setMode(mode)}
         onChangeGradientType={(gt) => setGradientType(gt)}
         onChangeColorStop={(cs) => setColorColorStops(cs)}
       />
