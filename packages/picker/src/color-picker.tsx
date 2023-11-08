@@ -58,6 +58,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   // NOTE: using range 0 to 1 for saturation and brightness to not confuse tiny color
   const cacheHsv = useRef({ h: 0, s: 0, v: 1, a: 1 })
+  const cacheHex = useRef('ffffff')
   const huePointerRef = useRef<HTMLElement>(null)
   const hueCanvasRef = useRef<HTMLCanvasElement>(null)
   const alphaPointerRef = useRef<HTMLElement>(null)
@@ -75,10 +76,18 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       const newColor = new TinyColor(color)
       const currentColor = new TinyColor(cacheHsv.current)
 
-      if (newColor.isValid && !newColor.equals(currentColor)) {
+      if (
+        newColor.isValid &&
+        !newColor.equals(currentColor) &&
+        newColor.toHex(false) !== cacheHex.current
+      ) {
         // eslint-disable-next-line prefer-const
         let { h, s, v, a } = newColor.toHsv()
         const { r, g, b } = newColor.toRgb()
+
+        if (s === 0) {
+          h = cacheHsv.current.h
+        }
 
         setAlpha(a)
         if (alphaPointerEl && alphaCanvasEl) {
@@ -105,6 +114,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           v,
           a,
         }
+        cacheHex.current = newColor.toHex(false)
       }
     }
   }, [color])
@@ -183,6 +193,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       s: s / 100,
       v: v / 100,
       a,
+    }
+
+    if (rgb) {
+      const { r, g, b } = rgb
+      cacheHex.current = rgbToHex(r, g, b, false)
     }
 
     if (onChange && rgb && !opts?.ignoreCallback) {
